@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#ifdef __linux__
+#include <ncurses.h>
+#else
 #include <ncurses/ncurses.h>
+#endif
 #include <inttypes.h>
 #include <string.h>
 #include <unistd.h>
