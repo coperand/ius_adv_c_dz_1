@@ -164,8 +164,27 @@ void go(struct snake_t *head)
     }
     refresh();
 }
+int checkDirection(struct snake_t* snake, const int32_t key)
+{
+    //Если направление равно противоположному, возвращаем -1
+    for (int i = 0; i < CONTROLS; i++)
+    {
+        if (key == snake->controls[i].down && snake->direction == UP ||
+            key == snake->controls[i].up && snake->direction == DOWN ||
+            key == snake->controls[i].right && snake->direction == LEFT ||
+            key == snake->controls[i].left && snake->direction == RIGHT)
+            return -1;
+    }
+
+    //Если всё хорошо - 0
+    return 0;
+}
 void changeDirection(struct snake_t* snake, const int32_t key)
 {
+    //Если направление некорректно, выходим
+    if(checkDirection(snake, key))
+        return;
+
     for (int i = 0; i < CONTROLS; i++)
     {
         if (key == snake->controls[i].down)
