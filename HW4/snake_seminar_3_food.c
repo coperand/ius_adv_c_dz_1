@@ -10,6 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 #define MIN_Y  2
+#define CONTROLS 2
 enum {LEFT=1, UP, RIGHT, DOWN, STOP_GAME=KEY_F(10)};
 enum {MAX_TAIL_SIZE=100, START_TAIL_SIZE=3, MAX_FOOD_SIZE=20, FOOD_EXPIRE_SECONDS=10,SEED_NUMBER=3};
 // Здесь храним коды управления змейкой
@@ -20,7 +21,10 @@ struct control_buttons
     int left;
     int right;
 }control_buttons;
-struct control_buttons default_controls = {KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT};
+struct control_buttons default_controls[CONTROLS] = {
+    {KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT},
+    {'s', 'w', 'a', 'd'}
+};
 /*
  Голова змейки содержит в себе
  x,y - координаты текущей позиции
@@ -35,7 +39,7 @@ typedef struct snake_t
     int direction;
     size_t tsize;
     struct tail_t *tail;
-    struct control_buttons controls;
+    struct control_buttons* controls;
 } snake_t;
 /*
  Хвост это массив состоящий из координат x,y
@@ -162,14 +166,17 @@ void go(struct snake_t *head)
 }
 void changeDirection(struct snake_t* snake, const int32_t key)
 {
-    if (key == snake->controls.down)
-        snake->direction = DOWN;
-    else if (key == snake->controls.up)
-        snake->direction = UP;
-    else if (key == snake->controls.right)
-        snake->direction = RIGHT;
-    else if (key == snake->controls.left)
-        snake->direction = LEFT;
+    for (int i = 0; i < CONTROLS; i++)
+    {
+        if (key == snake->controls[i].down)
+            snake->direction = DOWN;
+        else if (key == snake->controls[i].up)
+            snake->direction = UP;
+        else if (key == snake->controls[i].right)
+            snake->direction = RIGHT;
+        else if (key == snake->controls[i].left)
+            snake->direction = LEFT;
+    }
 }
 /*
  Движение хвоста с учетом движения головы
