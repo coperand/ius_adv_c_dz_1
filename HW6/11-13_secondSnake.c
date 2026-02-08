@@ -207,7 +207,14 @@ void goTail(struct snake_t *head)
 //Проверка того, является ли какое-то из зерен съеденным,
 _Bool haveEat(struct snake_t *head, struct food f[])
 {
-    //...нужно написать код...//
+    for (size_t i = 0; i < MAX_FOOD_SIZE; i++)
+    {
+        if (f[i].enable && head->x == f[i].x && head->y == f[i].y)
+        {
+            f[i].enable = 0;
+            return 1;
+        }
+    }
     return 0;
 }
 
@@ -217,14 +224,24 @@ _Bool haveEat(struct snake_t *head, struct food f[])
 
 void addTail(struct snake_t *head)
 {
-    //...нужно написать код...//
+    if (head->tsize < MAX_TAIL_SIZE)
+        head->tsize++;
 }
 //========================================================================
-int checkDirection(snake_t* snake, int32_t key)
+int checkDirection(struct snake_t* snake, const int32_t key)
 {
-    //...нужно написать код...//
-    return 1;
+    //Если направление равно противоположному, возвращаем 0
+    for (int i = 0; i < CONTROLS; i++)
+    {
+        if ( (key == snake->controls.down && snake->direction == UP) ||
+            (key == snake->controls.up && snake->direction == DOWN) ||
+            (key == snake->controls.right && snake->direction == LEFT) ||
+            (key == snake->controls.left && snake->direction == RIGHT) )
+            return 0;
+    }
 
+    //Если всё хорошо - 1
+    return 1;
 }
 
 //Вынести тело цикла while из int main() в отдельную функцию update
@@ -251,7 +268,11 @@ void update(struct snake_t *head, struct food f[], const int32_t key)
 
 _Bool isCrush(snake_t * snake)
 {
-    //...нужно написать код...//
+    for (size_t i = 1; i < snake->tsize; i++)
+    {
+        if (snake->x == snake->tail[i].x && snake->y == snake->tail[i].y)
+            return 1;
+    }
     return 0;
 }
 //========================================================================
@@ -262,13 +283,41 @@ void repairSeed(struct food f[], size_t nfood, struct snake_t *head)
         for( size_t j=0; j<nfood; j++ )
         {
             /* Если хвост совпадает с зерном */
-            //...нужно написать код...//
+
+            if (!f[j].enable)
+                continue;
+
+            if (f[j].x == head->x && f[j].y == head->y)
+            {
+                putFoodSeed(&f[j]);
+                continue;
+            }
+
+            for (size_t i = 0; i < head->tsize; i++)
+            {
+                if (f[j].x == head->tail[i].x && f[j].y == head->tail[i].y)
+                {
+                    putFoodSeed(&f[j]);
+                    break;
+                }
+            }
         }
     for( size_t i=0; i<nfood; i++ )
         for( size_t j=0; j<nfood; j++ )
         {
             /* Если два зерна на одной точке */
-            //...нужно написать код...//
+
+            if (!f[j].enable)
+                continue;
+
+            for (size_t j = i + 1; j < nfood; j++)
+            {
+                if (!f[j].enable)
+                    continue;
+
+                if (f[i].x == f[j].x && f[i].y == f[j].y)
+                    putFoodSeed(&f[j]);
+            }
         }
 }
 
