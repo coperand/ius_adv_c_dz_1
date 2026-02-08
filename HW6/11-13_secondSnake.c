@@ -259,13 +259,35 @@ void update(struct snake_t *head, struct food f[], const int32_t key)
 }
 //========================================================================
 
-_Bool isCrush(snake_t * snake)
+_Bool isCrush(snake_t * snakes[], size_t index)
 {
-    for (size_t i = 1; i < snake->tsize; i++)
+    int max_x, max_y;
+    getmaxyx(stdscr, max_y, max_x);
+
+    //Проверяем на выход за границы экрана
+    if (snakes[index]->x < 0 || snakes[index]->x >= max_x || snakes[index]->y < 1 || snakes[index]->y >= max_y)
+        return 1;
+
+    //Проверяем на столкновение с собой
+    for (size_t i = 1; i < snakes[index]->tsize; i++)
     {
-        if (snake->x == snake->tail[i].x && snake->y == snake->tail[i].y)
+        if (snakes[index]->x == snakes[index]->tail[i].x && snakes[index]->y == snakes[index]->tail[i].y)
             return 1;
     }
+
+    //Проверяем на столкновение с другими змеями
+    for (size_t s = 0; s < PLAYERS; s++)
+    {
+        if (s == index)
+            continue;
+
+        for (size_t i = 0; i < snakes[s]->tsize; i++)
+        {
+            if (snakes[index]->x == snakes[s]->tail[i].x && snakes[index]->y == snakes[s]->tail[i].y)
+                return 1;
+        }
+    }
+
     return 0;
 }
 //========================================================================
@@ -339,8 +361,11 @@ snake_t* snakes[PLAYERS];
         for (int i = 0; i < PLAYERS; i++)
         {
             update(snakes[i], food, key_pressed);
-            if(isCrush(snakes[i]))
-                break;//!!!!!!
+            if(isCrush(snakes, i))
+            {
+                key_pressed = STOP_GAME;
+                break;
+            }
             repairSeed(food, SEED_NUMBER, snakes[i]);
         }
     }
