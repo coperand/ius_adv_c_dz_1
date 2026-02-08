@@ -23,7 +23,7 @@ struct control_buttons
     int right;
 } control_buttons;
 
-struct control_buttons default_controls[CONTROLS] = {{KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT},
+struct control_buttons default_controls[PLAYERS] = {{KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT},
                                                     {'s', 'w', 'a', 'd'}};
 
 /*
@@ -138,8 +138,7 @@ tail_t*  tail  = (tail_t*) malloc(MAX_TAIL_SIZE*sizeof(tail_t));
     initHead(head[i], x, y);
     head[i]->tail     = tail; // прикрепляем к голове хвост
     head[i]->tsize    = size+1;
-    //~ head[i]->controls = default_controls[i];
-    head[i]->controls = default_controls[0];
+    head[i]->controls = default_controls[i];
 }
 
 /*
@@ -154,9 +153,6 @@ void go(struct snake_t *head)
     switch (head->direction)
     {
     case LEFT:
-        if(head->x <= 0) // Циклическое движение, чтобы не
-            // уходить за пределы экрана
-            head->x = max_x;
         mvprintw(head->y, --(head->x), "%c", ch);
         break;
     case RIGHT:
@@ -231,14 +227,11 @@ void addTail(struct snake_t *head)
 int checkDirection(struct snake_t* snake, const int32_t key)
 {
     //Если направление равно противоположному, возвращаем 0
-    for (int i = 0; i < CONTROLS; i++)
-    {
-        if ( (key == snake->controls.down && snake->direction == UP) ||
-            (key == snake->controls.up && snake->direction == DOWN) ||
-            (key == snake->controls.right && snake->direction == LEFT) ||
-            (key == snake->controls.left && snake->direction == RIGHT) )
-            return 0;
-    }
+    if ( (key == snake->controls.down && snake->direction == UP) ||
+        (key == snake->controls.up && snake->direction == DOWN) ||
+        (key == snake->controls.right && snake->direction == LEFT) ||
+        (key == snake->controls.left && snake->direction == RIGHT) )
+        return 0;
 
     //Если всё хорошо - 1
     return 1;
@@ -251,7 +244,7 @@ void update(struct snake_t *head, struct food f[], const int32_t key)
     clock_t begin = clock();
     go(head);
     goTail(head);
-    if (checkDirection(head,key))
+    if (checkDirection(head, key))
     {
         changeDirection(head, key);
     }
