@@ -8,6 +8,7 @@
 
 #define MIN_Y  2
 double DELAY = 0.1;
+unsigned int END_DELAY = 3;
 #define PLAYERS  2
 
 enum {LEFT=1, UP, RIGHT, DOWN, STOP_GAME=KEY_F(10)};
@@ -350,7 +351,7 @@ snake_t* snakes[PLAYERS];
     raw();                // Откдючаем line buffering
     noecho();            // Отключаем echo() режим при вызове getch
     curs_set(FALSE);    //Отключаем курсор
-    mvprintw(0, 0,"Use arrows for control. Press 'F10' for EXIT");
+    mvprintw(0, 1,"Use arrows for control. Press 'F10' for EXIT");
     timeout(0);    //Отключаем таймаут после нажатия клавиши в цикле
     initFood(food, MAX_FOOD_SIZE);
     putFood(food, SEED_NUMBER);// Кладем зерна
@@ -369,6 +370,9 @@ snake_t* snakes[PLAYERS];
             repairSeed(food, SEED_NUMBER, snakes[i]);
         }
     }
+    mvprintw(1, 1,"Game ended");
+    refresh();
+    sleep(END_DELAY);
     for (int i = 0; i < PLAYERS; i++)
     {
         //printExit(snakes[i]);
